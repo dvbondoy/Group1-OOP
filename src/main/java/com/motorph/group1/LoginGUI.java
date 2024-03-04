@@ -2,15 +2,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package com.motorph.group2;
+package com.motorph.group1;
 
-import com.opencsv.CSVReader;
-import static java.awt.SystemColor.text;
-import java.io.FileReader;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import static javax.swing.JOptionPane.showMessageDialog;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -42,6 +39,7 @@ public class LoginGUI extends javax.swing.JFrame {
         btnLogin = new javax.swing.JButton();
         pwdPassword = new javax.swing.JPasswordField();
         chkShow = new javax.swing.JCheckBox();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("MotorPH Login");
@@ -76,6 +74,13 @@ public class LoginGUI extends javax.swing.JFrame {
             }
         });
 
+        jButton1.setText("jButton1");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -83,9 +88,14 @@ public class LoginGUI extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2))
-                .addGap(18, 18, 18)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel2))
+                        .addGap(27, 27, 27))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jButton1)
+                        .addGap(18, 18, 18)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(chkShow)
@@ -110,10 +120,15 @@ public class LoginGUI extends javax.swing.JFrame {
                     .addComponent(jLabel2)
                     .addComponent(pwdPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(chkShow)
-                    .addComponent(btnLogin))
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(chkShow)
+                            .addComponent(btnLogin))
+                        .addContainerGap(16, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jButton1))))
         );
 
         pack();
@@ -129,37 +144,12 @@ public class LoginGUI extends javax.swing.JFrame {
         
         char[] pass = this.pwdPassword.getPassword();
         String password = new String(pass);
-        String hash = hashPassword(password);
-
-        try {
-  
-            FileReader filereader = new FileReader("credentials.csv");
-
-            CSVReader csvReader = new CSVReader(filereader);
-            String[] nextRecord;
-            String[] cred = null;
-
-            while ((nextRecord = csvReader.readNext()) != null) {
-                if(nextRecord[0].equals(username ) && nextRecord[1].equals(hash)){
-                    cred = nextRecord;
-                    new PayrollGUI().setVisible(true);
-                    this.dispose();
-//                    for(String cell:cred){
-//                        System.out.print(cell+"\t");
-//                    }
-                    break;
-                }
-            }
-            
-            filereader.close();
-
-            if(cred == null){
-                showMessageDialog(null, "Access Denied!");
-                
-            }
-        }
-        catch (Exception e) {
-            e.printStackTrace();
+        if(Authentication.authenticate(username, password)){
+            new Profile().setVisible(true);
+            this.dispose();
+            System.out.println(UserInfo.EMPLOYEEID);
+        }else{
+            JOptionPane.showMessageDialog(null, "Incorrect username and password.");
         }
     }//GEN-LAST:event_btnLoginActionPerformed
 
@@ -177,6 +167,12 @@ public class LoginGUI extends javax.swing.JFrame {
         this.btnLogin.doClick();
     }//GEN-LAST:event_pwdPasswordActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        String test = Authentication.hashPassword("password");
+        System.out.println(test);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -186,6 +182,17 @@ public class LoginGUI extends javax.swing.JFrame {
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
+        
+//        final String DBURL = "jdbc:mysql://localhost/MotorphDB";
+//        final String DBUSER = "root";
+//        final String DBPASSWORD = "Hard2gue$$paswd";
+        
+//        try(Connection conn = DriverManager.getConnection(DBURL,DBUSER,DBPASSWORD)) {
+//            System.out.print("Hello");
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+        
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -236,6 +243,7 @@ public class LoginGUI extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnLogin;
     private javax.swing.JCheckBox chkShow;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPasswordField pwdPassword;
